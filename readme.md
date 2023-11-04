@@ -1,20 +1,22 @@
 # Data Embedding and Pinecone Indexing
 
-**Ingestion.py** is a Python script designed to create embeddings of data and facilitate the indexing of these embeddings in [Pinecone](https://www.pinecone.io/). Before using the script, you need to set specific environment variables for the OpenAI API key, Pinecone API key, and Pinecone environment region. This README provides an overview of the script and instructions on how to set these environment variables.
 
-## Table of Contents
+Ingestion.py is a Python program that facilitates the ingestion of text data, generates embeddings using OpenAI, and indexes these embeddings in Pinecone for fast and efficient retrieval. This README provides an overview of the program, installation instructions, usage guidelines, and configuration options.
 
-- [Introduction](#introduction)
-- [Setting Environment Variables](#setting-environment-variables)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+## Overview
 
-## Introduction
+Ingestion.py automates the process of transforming text data into semantic embeddings and indexing them in Pinecone, a high-performance vector database. This enables seamless and efficient semantic search over your text data, making it ideal for applications like recommendation systems, content retrieval, and more.
 
-Ingestion.py simplifies the process of generating embeddings from data and indexing them in Pinecone, a powerful vector database for efficient similarity search. Whether you're building a recommendation system, content retrieval, or any application requiring similarity-based querying, this script can streamline the process.
+## Usage
+
+### Install Dependencies
+
+Before using Ingestion.py, make sure you have the necessary dependencies installed. You can install them using pip:
+
+```shell
+pip install langchain pinecone python-dotenv
+````
+
 
 ## Setting Environment Variables
 
@@ -33,10 +35,79 @@ OPENAI_API_KEY=your-openai-api-key
 PINECONE_API_KEY=your-pinecone-api-key
 PINECONE_ENVIRONMENT_REGION=your-pinecone-environment-region
 ```
-## Features
-- Data Embeddings: Ingestion.py can create embeddings from various data sources, including text, images, and more.
-- Pinecone Integration: Seamlessly connect to Pinecone to create and manage embeddings in a scalable, high-performance vector database.
-- Embedding Customization: Customize embedding generation for your specific use case.
-- Scalability: Handle large-scale data and future growth with ease.
-- Logging and Monitoring: Monitor the status and performance of embedding generation and indexing.
-Efficient Search: Leverage Pinecone's capabilities for fast and accurate similarity search.
+
+
+
+Run Ingestion.py
+To start the ingestion process, simply run the Ingestion.py script:
+
+```shell
+python ingestion.py
+```
+## The program will perform the following steps:
+
+- **Load text data using the ReadTheDocsLoader:**
+Split the text into chunks using the RecursiveCharacterTextSplitter.
+Generate OpenAI embeddings for each chunk.
+Index the embeddings in Pinecone for fast retrieval.
+## Configuration
+You can configure various aspects of the ingestion process by modifying the provided configuration options in the config.yml file. The following parameters are available for customization:
+
+- TEXT_DATA_URL: URL of the text data source to ingest.
+- EMBEDDING_MODEL: The OpenAI embedding model to use.
+- CHUNK_SIZE: The size of text chunks to generate embeddings from.
+- CHUNK_OVERLAP: The overlap between consecutive text chunks.
+- PINECONE_INDEX_NAME: The name of the Pinecone index to create for storage.
+By adjusting these parameters, you can fine-tune the ingestion process to suit your specific use case.
+
+## How it Works
+Ingestion.py operates as follows:
+
+- ReadTheDocsLoader: Loads text data from the specified URL.
+- RecursiveCharacterTextSplitter: Splits the text into overlapping chunks for embedding generation.
+- OpenAIEmbeddings: Generates a vector embedding for each text chunk using the chosen OpenAI model.
+- A Pinecone index is created with the specified name.
+
+The embeddings and associated metadata are inserted into the Pinecone index.
+This workflow enables fast and efficient semantic search over the ingested text data using Pinecone's vector similarity search capabilities.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

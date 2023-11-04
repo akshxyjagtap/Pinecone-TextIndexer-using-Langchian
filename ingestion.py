@@ -9,45 +9,28 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# set environment variables
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT")
 
-os.getenv("OPENAI_API_KEY")
-# Ignore all warnings
-warnings.filterwarnings("ignore")
+TEXT_DATA_URL = "https://docs.python.org/3/tutorial/index.html"
+EMBEDDING_MODEL = "text-embedding-ada-002"
+CHUNK_SIZE = 1000
+CHUNK_OVERLAP = 0.8
 
-pinecone.init(
-    api_key=os.environ["PINECONE_API_KEY"],
-    environment=os.environ["PINECONE_ENVIRONMENT_REGION"],
-)
+pinecone.init(api_key=PINECONE_API_KEY, environment=PINECONE_ENVIRONMENT)
 
+index = pinecone.Index("python_docs")
 
-def ingest_docs() -> None:
-    try:
-        loader = ReadTheDocsLoader(path="langchain-docs/langchain.readthedocs.io/en/latest", encoding='utf-8',)
-        raw_documents = loader.load()
-        print(f"loaded {len(raw_documents) }documents")
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000, chunk_overlap=100, separators=["\n\n", "\n", " ", ""]
-        )
-        documents = text_splitter.split_documents(documents=raw_documents)
-        print(f"Splitted into {len(documents)} chunks")
+loader = ReadTheDocsLoader(TEXT_DATA_URL)
+text = loader.load()
 
-        for doc in documents:
-            old_path = doc.metadata["source"]
-            new_url = old_path.replace("langchain-docs", "https:/")
-            doc.metadata.update({"source": new_url})
+splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
+chunks = splitter.split_text(text)
 
-        print(f"Going to insert {len(documents)} to Pinecone")
-        embeddings = OpenAIEmbeddings()
-        Pinecone.from_documents(
-            documents, embeddings, index_name="langchain-doc-index"
-        )
-        print("Added to Pinecone vectorstore vectors")
-    except Exception as e:
-        # Handle other exceptions (if any) gracefully
-        print(f"An error occurred: {e}")
+embedder = OpenAIEmbeddings(model_name=EMBEDDING_MODEL)
+embeddings = embedder.embed_documents(chunks)
 
+index.upsert(embeddings)
 
-
-if __name__ == "__main__":
-    ingest_docs()
+print("Text ingestion and embedding complete!")
